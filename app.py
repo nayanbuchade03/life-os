@@ -1,23 +1,19 @@
 from flask import Flask, render_template
 from datetime import datetime
-from utils.db_helper import execute_query
+from routes.tasks import tasks_bp
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'life_os_secret_key_development' # Change in production
+app.config['SECRET_KEY'] = 'life_os_secret_key_development'
+
+app.register_blueprint(tasks_bp)
 
 @app.route('/')
 def dashboard():
-    """Renders the main dashboard."""
     today_date = datetime.now().strftime('%Y-%m-%d')
-    
     stats = {
-        'tasks_completed': 0,
-        'total_tasks': 0,
-        'current_streak': 0,
-        'dsa_today': 0,
-        'pending_followups': 0
+        'tasks_completed': 0, 'total_tasks': 0,
+        'current_streak': 0, 'dsa_today': 0, 'pending_followups': 0
     }
-    
     return render_template('dashboard.html', today_date=today_date, stats=stats)
 
 if __name__ == '__main__':
