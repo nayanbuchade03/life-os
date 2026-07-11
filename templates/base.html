@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,11 +8,18 @@
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
+
 <body>
 
     <nav class="sidebar">
         <div class="brand">Life<span>OS</span></div>
         <ul class="nav-menu">
+            <li>
+                <a href="{{ url_for('dsa.index') }}"
+                    class="nav-item {% if request.endpoint and request.endpoint.startswith('dsa') %}active{% endif %}">
+                    <i class="ph ph-code"></i> DSA Tracker
+                </a>
+            </li>
             <li>
                 <a href="{{ url_for('dashboard') }}" class="nav-item active">
                     <i class="ph ph-squares-four"></i> Dashboard
@@ -58,4 +66,5 @@
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     {% block scripts %}{% endblock %}
 </body>
+
 </html>

@@ -324,3 +324,6 @@ ul {
 .task-item.completed {
     opacity: 0.7;
 }
+
+.star-active { color: var(--accent-yellow); }
+.star-inactive { color: var(--border-color); }

@@ -1,12 +1,14 @@
 from flask import Flask, render_template
 from datetime import datetime
 from routes.tasks import tasks_bp
+from routes.dsa import dsa_bp
 from services import task_service
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'life_os_secret_key_development'
 
 app.register_blueprint(tasks_bp)
+app.register_blueprint(dsa_bp)
 
 @app.route('/')
 def dashboard():
