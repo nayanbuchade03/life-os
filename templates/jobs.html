@@ -47,26 +47,27 @@
                 <td>
                     <div style="font-weight: 500;">
                         {% if app.job_link %}
-                            <a href="{{ app.job_link }}" target="_blank" style="color: var(--accent-blue); text-decoration: underline;">{{ app.company }}</a>
+                        <a href="{{ app.job_link }}" target="_blank"
+                            style="color: var(--accent-blue); text-decoration: underline;">{{ app.company }}</a>
                         {% else %}
-                            {{ app.company }}
+                        {{ app.company }}
                         {% endif %}
                     </div>
                     <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 2px;">{{ app.role }}</div>
                 </td>
                 <td>
                     {% if app.current_status in ['Wishlist', 'Preparing'] %}
-                        <span class="status-badge badge-gray">{{ app.current_status }}</span>
+                    <span class="status-badge badge-gray">{{ app.current_status }}</span>
                     {% elif app.current_status == 'Applied' %}
-                        <span class="status-badge badge-blue">{{ app.current_status }}</span>
+                    <span class="status-badge badge-blue">{{ app.current_status }}</span>
                     {% elif app.current_status in ['OA Scheduled', 'OA Completed'] %}
-                        <span class="status-badge badge-purple">{{ app.current_status }}</span>
+                    <span class="status-badge badge-purple">{{ app.current_status }}</span>
                     {% elif app.current_status in ['Interview Scheduled', 'Interview Completed'] %}
-                        <span class="status-badge badge-orange">{{ app.current_status }}</span>
+                    <span class="status-badge badge-orange">{{ app.current_status }}</span>
                     {% elif app.current_status in ['Offer', 'Accepted'] %}
-                        <span class="status-badge badge-green">{{ app.current_status }}</span>
+                    <span class="status-badge badge-green">{{ app.current_status }}</span>
                     {% else %}
-                        <span class="status-badge badge-red">{{ app.current_status }}</span>
+                    <span class="status-badge badge-red">{{ app.current_status }}</span>
                     {% endif %}
                 </td>
                 <td>{{ app.date_applied }}</td>
@@ -75,23 +76,20 @@
                     <div style="font-size: 0.8rem; color: var(--text-secondary);">{{ app.salary or '--' }}</div>
                 </td>
                 <td style="text-align: right; display: flex; justify-content: flex-end; gap: 0.5rem;">
-                    <button class="btn-icon" 
-                            data-modal-target="#editJobModal"
-                            data-id="{{ app.id }}"
-                            data-company="{{ app.company }}"
-                            data-role="{{ app.role }}"
-                            data-location="{{ app.location }}"
-                            data-salary="{{ app.salary }}"
-                            data-source="{{ app.source }}"
-                            data-link="{{ app.job_link }}"
-                            data-resume="{{ app.resume_version }}"
-                            data-date="{{ app.date_applied }}"
-                            data-status="{{ app.current_status }}"
-                            data-notes="{{ app.notes }}">
+                    <button class="btn-icon" data-modal-target="#editJobModal" data-id="{{ app.id }}"
+                        data-company="{{ app.company }}" data-role="{{ app.role }}" data-location="{{ app.location }}"
+                        data-salary="{{ app.salary }}" data-source="{{ app.source }}" data-link="{{ app.job_link }}"
+                        data-resume="{{ app.resume_version }}" data-date="{{ app.date_applied }}"
+                        data-status="{{ app.current_status }}" data-notes="{{ app.notes }}">
                         <i class="ph ph-pencil-simple"></i>
                     </button>
+                    <button class="btn-icon" style="color: var(--accent-yellow);" data-modal-target="#addFollowUpModal"
+                        data-appid="{{ app.id }}" data-company="{{ app.company }}">
+                        <i class="ph ph-bell-ringing"></i>
+                    </button>
                     <form action="{{ url_for('jobs.delete', app_id=app.id) }}" method="POST" style="display:inline;">
-                        <button type="submit" class="btn-icon" style="color: var(--accent-red);" onclick="return confirm('Delete this application?');">
+                        <button type="submit" class="btn-icon" style="color: var(--accent-red);"
+                            onclick="return confirm('Delete this application?');">
                             <i class="ph ph-trash"></i>
                         </button>
                     </form>
@@ -99,7 +97,8 @@
             </tr>
             {% else %}
             <tr>
-                <td colspan="5" style="text-align: center; color: var(--text-secondary); padding: 2rem;">No applications tracked yet. Keep pushing!</td>
+                <td colspan="5" style="text-align: center; color: var(--text-secondary); padding: 2rem;">No applications
+                    tracked yet. Keep pushing!</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -123,7 +122,7 @@
                     <input type="text" name="role" class="form-control" required>
                 </div>
             </div>
-            
+
             <div class="form-row">
                 <div class="form-group">
                     <label>Status</label>
@@ -157,7 +156,7 @@
                     <input type="text" name="salary" class="form-control">
                 </div>
             </div>
-            
+
             <div class="form-group">
                 <label>Job Link</label>
                 <input type="url" name="job_link" class="form-control">
@@ -169,7 +168,8 @@
             </div>
 
             <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem;">
-                <button type="button" class="btn" style="background: var(--bg-surface-hover); color: white;" data-modal-close>Cancel</button>
+                <button type="button" class="btn" style="background: var(--bg-surface-hover); color: white;"
+                    data-modal-close>Cancel</button>
                 <button type="submit" class="btn btn-primary">Save Application</button>
             </div>
         </form>
@@ -234,7 +234,8 @@
                 <textarea name="notes" class="form-control" rows="2"></textarea>
             </div>
             <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem;">
-                <button type="button" class="btn" style="background: var(--bg-surface-hover); color: white;" data-modal-close>Cancel</button>
+                <button type="button" class="btn" style="background: var(--bg-surface-hover); color: white;"
+                    data-modal-close>Cancel</button>
                 <button type="submit" class="btn btn-primary">Update</button>
             </div>
         </form>
@@ -248,7 +249,7 @@
             btn.addEventListener('click', () => {
                 const target = document.querySelector('#editJobModal');
                 const form = target.querySelector('form');
-                
+
                 form.action = `/jobs/edit/${btn.dataset.id}`;
                 form.querySelector('[name="company"]').value = btn.dataset.company;
                 form.querySelector('[name="role"]').value = btn.dataset.role;
@@ -259,6 +260,50 @@
                 form.querySelector('[name="job_link"]').value = btn.dataset.link || '';
                 form.querySelector('[name="notes"]').value = btn.dataset.notes || '';
             });
+        });
+    });
+</script>
+<div class="modal-overlay" id="addFollowUpModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="card-title" style="font-size: 1.25rem;">Schedule Follow-up</h2>
+            <button class="close-modal">&times;</button>
+        </div>
+        <form action="{{ url_for('follow_ups.add') }}" method="POST">
+            <input type="hidden" name="application_id" id="fu_application_id">
+            
+            <p class="page-subtitle" style="margin-bottom: 1.5rem;">For: <span id="fu_company_name" style="color: var(--text-primary); font-weight: 500;"></span></p>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Follow-up Date</label>
+                    <input type="date" name="follow_up_date" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Reminder Time (Optional)</label>
+                    <input type="time" name="reminder_time" class="form-control">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Notes (Who to email? What to say?)</label>
+                <textarea name="notes" class="form-control" rows="3" placeholder="e.g. Email recruiter asking for OA results"></textarea>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem;">
+                <button type="button" class="btn" style="background: var(--bg-surface-hover); color: white;" data-modal-close>Cancel</button>
+                <button type="submit" class="btn btn-primary">Schedule Reminder</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const fuBtns = document.querySelectorAll('[data-modal-target="#addFollowUpModal"]');
+    fuBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.getElementById('fu_application_id').value = btn.dataset.appid;
+            document.getElementById('fu_company_name').textContent = btn.dataset.company;
         });
     });
 </script>

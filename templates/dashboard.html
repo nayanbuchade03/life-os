@@ -78,14 +78,26 @@
         </div>
     </div>
 
-    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-        <div class="card" style="min-height: 140px;">
-            <h3 class="card-title">Upcoming Deadlines</h3>
-            <p class="page-subtitle" style="margin-top: 0.5rem;">No immediate deadlines.</p>
-        </div>
-        <div class="card" style="min-height: 140px;">
-            <h3 class="card-title">Weekly Goals Progress</h3>
-            <p class="page-subtitle" style="margin-top: 0.5rem;">Data not available yet.</p>
+    <div class="card" style="min-height: 250px;">
+        <h3 class="card-title" style="margin-bottom: 1rem;">Pending Follow-ups</h3>
+        <div class="task-list">
+            {% for fu in follow_ups %}
+            <div class="task-item" id="fu-{{ fu.id }}">
+                <button class="task-toggle" onclick="toggleFollowUp('{{ fu.id }}')">
+                    <i class="ph ph-circle"></i>
+                </button>
+                <div class="task-content">
+                    <span class="task-title">Follow up: {{ fu.company }}</span>
+                    {% set overdue_class = 'text-overdue' if fu.follow_up_date < today_date else '' %} 
+                    <span
+                        class="task-meta {{ overdue_class }}">
+                        Due: {{ fu.follow_up_date }} | {{ fu.notes }}
+                    </span>
+                </div>
+            </div>
+            {% else %}
+            <p class="page-subtitle" style="padding: 1rem 0;">No pending follow-ups. Inbox zero!</p>
+            {% endfor %}
         </div>
     </div>
 </div>
@@ -133,21 +145,40 @@
 
     function toggleRevision(revisionId) {
         const revItem = document.getElementById(`rev-${revisionId}`);
-        
+
         revItem.style.opacity = '0.5';
         revItem.querySelector('.task-toggle').innerHTML = '<i class="ph-fill ph-check-circle" style="color: var(--accent-green);"></i>';
 
         fetch('/dsa/toggle_revision', {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ revision_id: revisionId })
         })
-        .then(response => response.json())
-        .then(data => {
-            if(data.success) {
-                setTimeout(() => window.location.reload(), 300);
-            }
-        });
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    setTimeout(() => window.location.reload(), 300);
+                }
+            });
+    }
+
+    function toggleFollowUp(followUpId) {
+        const fuItem = document.getElementById(`fu-${followUpId}`);
+
+        fuItem.style.opacity = '0.5';
+        fuItem.querySelector('.task-toggle').innerHTML = '<i class="ph-fill ph-check-circle" style="color: var(--accent-green);"></i>';
+
+        fetch('/follow_ups/toggle', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ follow_up_id: followUpId })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    setTimeout(() => window.location.reload(), 300);
+                }
+            });
     }
 </script>
 {% endblock %}
