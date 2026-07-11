@@ -1,0 +1,265 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<header class="page-header" style="display: flex; justify-content: space-between; align-items: flex-end;">
+    <div>
+        <h1 class="page-title">Job Pipeline</h1>
+        <p class="page-subtitle">Track your applications and interview stages.</p>
+    </div>
+    <button class="btn btn-primary" data-modal-target="#addJobModal">
+        <i class="ph ph-plus"></i> New Application
+    </button>
+</header>
+
+<div class="dashboard-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 2rem;">
+    <div class="card" style="padding: 1rem;">
+        <span class="card-title">Applied / Active</span>
+        <div class="card-value">{{ stats.active_applications or 0 }}</div>
+    </div>
+    <div class="card" style="padding: 1rem; border-color: var(--accent-yellow);">
+        <span class="card-title">Interviewing (OA/Tech)</span>
+        <div class="card-value">{{ stats.interviewing or 0 }}</div>
+    </div>
+    <div class="card" style="padding: 1rem; border-color: var(--accent-green);">
+        <span class="card-title">Offers</span>
+        <div class="card-value">{{ stats.offers or 0 }}</div>
+    </div>
+    <div class="card" style="padding: 1rem;">
+        <span class="card-title">Closed / Rejected</span>
+        <div class="card-value">{{ stats.closed or 0 }}</div>
+    </div>
+</div>
+
+<div class="table-container">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Company & Role</th>
+                <th>Status</th>
+                <th>Date Applied</th>
+                <th>Location / Salary</th>
+                <th style="text-align: right;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for app in applications %}
+            <tr>
+                <td>
+                    <div style="font-weight: 500;">
+                        {% if app.job_link %}
+                            <a href="{{ app.job_link }}" target="_blank" style="color: var(--accent-blue); text-decoration: underline;">{{ app.company }}</a>
+                        {% else %}
+                            {{ app.company }}
+                        {% endif %}
+                    </div>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 2px;">{{ app.role }}</div>
+                </td>
+                <td>
+                    {% if app.current_status in ['Wishlist', 'Preparing'] %}
+                        <span class="status-badge badge-gray">{{ app.current_status }}</span>
+                    {% elif app.current_status == 'Applied' %}
+                        <span class="status-badge badge-blue">{{ app.current_status }}</span>
+                    {% elif app.current_status in ['OA Scheduled', 'OA Completed'] %}
+                        <span class="status-badge badge-purple">{{ app.current_status }}</span>
+                    {% elif app.current_status in ['Interview Scheduled', 'Interview Completed'] %}
+                        <span class="status-badge badge-orange">{{ app.current_status }}</span>
+                    {% elif app.current_status in ['Offer', 'Accepted'] %}
+                        <span class="status-badge badge-green">{{ app.current_status }}</span>
+                    {% else %}
+                        <span class="status-badge badge-red">{{ app.current_status }}</span>
+                    {% endif %}
+                </td>
+                <td>{{ app.date_applied }}</td>
+                <td>
+                    <div style="font-size: 0.9rem;">{{ app.location or '--' }}</div>
+                    <div style="font-size: 0.8rem; color: var(--text-secondary);">{{ app.salary or '--' }}</div>
+                </td>
+                <td style="text-align: right; display: flex; justify-content: flex-end; gap: 0.5rem;">
+                    <button class="btn-icon" 
+                            data-modal-target="#editJobModal"
+                            data-id="{{ app.id }}"
+                            data-company="{{ app.company }}"
+                            data-role="{{ app.role }}"
+                            data-location="{{ app.location }}"
+                            data-salary="{{ app.salary }}"
+                            data-source="{{ app.source }}"
+                            data-link="{{ app.job_link }}"
+                            data-resume="{{ app.resume_version }}"
+                            data-date="{{ app.date_applied }}"
+                            data-status="{{ app.current_status }}"
+                            data-notes="{{ app.notes }}">
+                        <i class="ph ph-pencil-simple"></i>
+                    </button>
+                    <form action="{{ url_for('jobs.delete', app_id=app.id) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn-icon" style="color: var(--accent-red);" onclick="return confirm('Delete this application?');">
+                            <i class="ph ph-trash"></i>
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5" style="text-align: center; color: var(--text-secondary); padding: 2rem;">No applications tracked yet. Keep pushing!</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="modal-overlay" id="addJobModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="card-title" style="font-size: 1.25rem;">New Application</h2>
+            <button class="close-modal">&times;</button>
+        </div>
+        <form action="{{ url_for('jobs.add') }}" method="POST">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Company</label>
+                    <input type="text" name="company" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Role</label>
+                    <input type="text" name="role" class="form-control" required>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Status</label>
+                    <select name="current_status" class="form-control">
+                        <option value="Wishlist">Wishlist</option>
+                        <option value="Preparing">Preparing</option>
+                        <option value="Applied" selected>Applied</option>
+                        <option value="OA Scheduled">OA Scheduled</option>
+                        <option value="OA Completed">OA Completed</option>
+                        <option value="Interview Scheduled">Interview Scheduled</option>
+                        <option value="Interview Completed">Interview Completed</option>
+                        <option value="Rejected">Rejected</option>
+                        <option value="Offer">Offer</option>
+                        <option value="Accepted">Accepted</option>
+                        <option value="Declined">Declined</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Date Applied</label>
+                    <input type="date" name="date_applied" class="form-control" value="{{ today_date }}" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Location</label>
+                    <input type="text" name="location" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Salary Exp.</label>
+                    <input type="text" name="salary" class="form-control">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Job Link</label>
+                <input type="url" name="job_link" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label>Notes</label>
+                <textarea name="notes" class="form-control" rows="2"></textarea>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem;">
+                <button type="button" class="btn" style="background: var(--bg-surface-hover); color: white;" data-modal-close>Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Application</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal-overlay" id="editJobModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="card-title" style="font-size: 1.25rem;">Edit Application</h2>
+            <button class="close-modal">&times;</button>
+        </div>
+        <form action="" method="POST" id="editForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Company</label>
+                    <input type="text" name="company" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Role</label>
+                    <input type="text" name="role" class="form-control" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Status</label>
+                    <select name="current_status" class="form-control">
+                        <option value="Wishlist">Wishlist</option>
+                        <option value="Preparing">Preparing</option>
+                        <option value="Applied">Applied</option>
+                        <option value="OA Scheduled">OA Scheduled</option>
+                        <option value="OA Completed">OA Completed</option>
+                        <option value="Interview Scheduled">Interview Scheduled</option>
+                        <option value="Interview Completed">Interview Completed</option>
+                        <option value="Rejected">Rejected</option>
+                        <option value="Offer">Offer</option>
+                        <option value="Accepted">Accepted</option>
+                        <option value="Declined">Declined</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Date Applied</label>
+                    <input type="date" name="date_applied" class="form-control" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Location</label>
+                    <input type="text" name="location" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Salary Exp.</label>
+                    <input type="text" name="salary" class="form-control">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Job Link</label>
+                <input type="url" name="job_link" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Notes</label>
+                <textarea name="notes" class="form-control" rows="2"></textarea>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem;">
+                <button type="button" class="btn" style="background: var(--bg-surface-hover); color: white;" data-modal-close>Cancel</button>
+                <button type="submit" class="btn btn-primary">Update</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const editBtns = document.querySelectorAll('[data-modal-target="#editJobModal"]');
+        editBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const target = document.querySelector('#editJobModal');
+                const form = target.querySelector('form');
+                
+                form.action = `/jobs/edit/${btn.dataset.id}`;
+                form.querySelector('[name="company"]').value = btn.dataset.company;
+                form.querySelector('[name="role"]').value = btn.dataset.role;
+                form.querySelector('[name="current_status"]').value = btn.dataset.status;
+                form.querySelector('[name="date_applied"]').value = btn.dataset.date;
+                form.querySelector('[name="location"]').value = btn.dataset.location || '';
+                form.querySelector('[name="salary"]').value = btn.dataset.salary || '';
+                form.querySelector('[name="job_link"]').value = btn.dataset.link || '';
+                form.querySelector('[name="notes"]').value = btn.dataset.notes || '';
+            });
+        });
+    });
+</script>
+{% endblock %}

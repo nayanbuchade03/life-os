@@ -15,6 +15,12 @@
         <div class="brand">Life<span>OS</span></div>
         <ul class="nav-menu">
             <li>
+                <a href="{{ url_for('jobs.index') }}"
+                    class="nav-item {% if request.endpoint and request.endpoint.startswith('jobs') %}active{% endif %}">
+                    <i class="ph ph-briefcase"></i> Job Applications
+                </a>
+            </li>
+            <li>
                 <a href="{{ url_for('dsa.index') }}"
                     class="nav-item {% if request.endpoint and request.endpoint.startswith('dsa') %}active{% endif %}">
                     <i class="ph ph-code"></i> DSA Tracker

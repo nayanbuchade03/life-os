@@ -327,3 +327,7 @@ ul {
 
 .star-active { color: var(--accent-yellow); }
 .star-inactive { color: var(--border-color); }
+
+.badge-gray { background-color: rgba(148, 163, 184, 0.2); color: #94a3b8; }
+.badge-purple { background-color: rgba(168, 85, 247, 0.2); color: #a855f7; }
+.badge-orange { background-color: rgba(249, 115, 22, 0.2); color: #f97316; }
