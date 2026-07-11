@@ -1,3 +1,4 @@
+from flask import jsonify
 from flask import Blueprint, render_template, request, redirect, url_for
 from services import task_service
 
@@ -22,3 +23,16 @@ def edit(task_id):
 def delete(task_id):
     task_service.delete_task(task_id)
     return redirect(url_for('tasks.index'))
+
+@tasks_bp.route('/log_status', methods=['POST'])
+def log_status():
+    data = request.get_json()
+    task_id = data.get('task_id')
+    date_str = data.get('date')
+    status = data.get('status')
+    
+    if not all([task_id, date_str, status]):
+        return jsonify({'error': 'Missing data'}), 400
+        
+    task_service.log_task_status(task_id, date_str, status)
+    return jsonify({'success': True, 'status': status})

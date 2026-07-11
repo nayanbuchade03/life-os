@@ -37,8 +37,30 @@
 
 <div class="dashboard-grid" style="grid-template-columns: 2fr 1fr;">
     <div class="card" style="min-height: 300px;">
-        <h3 class="card-title" style="margin-bottom: 1rem;">Today's Priority Tasks</h3>
-        <p class="page-subtitle">No tasks scheduled for today yet.</p>
+        <h3 class="card-title">Today's Priority Tasks</h3>
+        
+        <div class="task-list">
+            {% for task in tasks %}
+            <div class="task-item {% if task.completion_status == 'Completed' %}completed{% endif %}" 
+                 data-task-id="{{ task.id }}">
+                
+                <button class="task-toggle" onclick="toggleTask('{{ task.id }}', '{{ task.completion_status }}', this)">
+                    {% if task.completion_status == 'Completed' %}
+                        <i class="ph-fill ph-check-circle"></i>
+                    {% else %}
+                        <i class="ph ph-circle"></i>
+                    {% endif %}
+                </button>
+                
+                <div class="task-content">
+                    <span class="task-title">{{ task.title }}</span>
+                    <span class="task-meta">{{ task.category }} • Priority: {{ task.priority }}</span>
+                </div>
+            </div>
+            {% else %}
+            <p class="page-subtitle" style="padding: 1rem 0;">All clear. No tasks scheduled for today.</p>
+            {% endfor %}
+        </div>
     </div>
 
     <div style="display: flex; flex-direction: column; gap: 1.5rem;">
@@ -52,4 +74,46 @@
         </div>
     </div>
 </div>
+
+<script>
+    const TODAY_DATE = "{{ today_date }}";
+
+    function toggleTask(taskId, currentStatus, buttonElement) {
+        const newStatus = currentStatus === 'Completed' ? 'Pending' : 'Completed';
+        const taskItem = buttonElement.closest('.task-item');
+        
+        if (newStatus === 'Completed') {
+            taskItem.classList.add('completed');
+            buttonElement.innerHTML = '<i class="ph-fill ph-check-circle"></i>';
+            buttonElement.setAttribute('onclick', `toggleTask(${taskId}, 'Completed', this)`);
+        } else {
+            taskItem.classList.remove('completed');
+            buttonElement.innerHTML = '<i class="ph ph-circle"></i>';
+            buttonElement.setAttribute('onclick', `toggleTask(${taskId}, 'Pending', this)`);
+        }
+
+        fetch('/tasks/log_status', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                task_id: taskId,
+                date: TODAY_DATE,
+                status: newStatus
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.success) {
+                setTimeout(() => window.location.reload(), 300);
+            }
+        })
+        .catch(err => {
+            console.error("Error updating task:", err);
+            alert("Failed to save task status. Reverting UI.");
+            window.location.reload();
+        });
+    }
+</script>
 {% endblock %}
