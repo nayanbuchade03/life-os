@@ -70,3 +70,16 @@ def _generate_revision_schedule(problem_id, date_solved_str):
     for stage_name, days_to_add in REVISION_STAGES.items():
         revision_date = (base_date + timedelta(days=days_to_add)).strftime('%Y-%m-%d')
         execute_query(insert_query, (problem_id, revision_date, stage_name), commit=True)
+
+def get_todays_revisions(date_str):
+    query = """
+        SELECT r.id, r.stage, p.problem_name, p.link
+        FROM dsa_revisions r
+        JOIN dsa_problems p ON r.problem_id = p.id
+        WHERE r.revision_date = ? AND r.status = 'Pending'
+    """
+    return execute_query(query, (date_str,))
+
+def mark_revision_complete(revision_id):
+    query = "UPDATE dsa_revisions SET status = 'Completed' WHERE id = ?"
+    return execute_query(query, (revision_id,), commit=True)

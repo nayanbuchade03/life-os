@@ -16,13 +16,28 @@
         <p class="page-subtitle" style="margin-top: 0.5rem;">Current Streak: {{ stats.current_streak }} days</p>
     </div>
 
-    <div class="card">
+    <!-- Replace your current "DSA Revisions Today" card with this: -->
+    <div class="card" style="min-height: 250px;">
         <div class="card-header">
             <span class="card-title">DSA Revisions Today</span>
             <i class="ph ph-code" style="color: var(--accent-blue); font-size: 1.5rem;"></i>
         </div>
-        <div class="card-value">{{ stats.dsa_today }}</div>
-        <p class="page-subtitle" style="margin-top: 0.5rem;">Problems pending review</p>
+
+        <div class="task-list">
+            {% for rev in revisions %}
+            <div class="task-item" id="rev-{{ rev.id }}">
+                <button class="task-toggle" onclick="toggleRevision('{{ rev.id }}')">
+                    <i class="ph ph-circle"></i>
+                </button>
+                <div class="task-content">
+                    <span class="task-title">{{ rev.problem_name }}</span>
+                    <span class="task-meta">Stage: {{ rev.stage }}</span>
+                </div>
+            </div>
+            {% else %}
+            <p class="page-subtitle" style="padding: 1rem 0;">No revisions due today.</p>
+            {% endfor %}
+        </div>
     </div>
 
     <div class="card">
@@ -38,20 +53,20 @@
 <div class="dashboard-grid" style="grid-template-columns: 2fr 1fr;">
     <div class="card" style="min-height: 300px;">
         <h3 class="card-title">Today's Priority Tasks</h3>
-        
+
         <div class="task-list">
             {% for task in tasks %}
-            <div class="task-item {% if task.completion_status == 'Completed' %}completed{% endif %}" 
-                 data-task-id="{{ task.id }}">
-                
+            <div class="task-item {% if task.completion_status == 'Completed' %}completed{% endif %}"
+                data-task-id="{{ task.id }}">
+
                 <button class="task-toggle" onclick="toggleTask('{{ task.id }}', '{{ task.completion_status }}', this)">
                     {% if task.completion_status == 'Completed' %}
-                        <i class="ph-fill ph-check-circle"></i>
+                    <i class="ph-fill ph-check-circle"></i>
                     {% else %}
-                        <i class="ph ph-circle"></i>
+                    <i class="ph ph-circle"></i>
                     {% endif %}
                 </button>
-                
+
                 <div class="task-content">
                     <span class="task-title">{{ task.title }}</span>
                     <span class="task-meta">{{ task.category }} • Priority: {{ task.priority }}</span>
@@ -81,7 +96,7 @@
     function toggleTask(taskId, currentStatus, buttonElement) {
         const newStatus = currentStatus === 'Completed' ? 'Pending' : 'Completed';
         const taskItem = buttonElement.closest('.task-item');
-        
+
         if (newStatus === 'Completed') {
             taskItem.classList.add('completed');
             buttonElement.innerHTML = '<i class="ph-fill ph-check-circle"></i>';
@@ -103,16 +118,35 @@
                 status: newStatus
             })
         })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    setTimeout(() => window.location.reload(), 300);
+                }
+            })
+            .catch(err => {
+                console.error("Error updating task:", err);
+                alert("Failed to save task status. Reverting UI.");
+                window.location.reload();
+            });
+    }
+
+    function toggleRevision(revisionId) {
+        const revItem = document.getElementById(`rev-${revisionId}`);
+        
+        revItem.style.opacity = '0.5';
+        revItem.querySelector('.task-toggle').innerHTML = '<i class="ph-fill ph-check-circle" style="color: var(--accent-green);"></i>';
+
+        fetch('/dsa/toggle_revision', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ revision_id: revisionId })
+        })
         .then(response => response.json())
         .then(data => {
             if(data.success) {
                 setTimeout(() => window.location.reload(), 300);
             }
-        })
-        .catch(err => {
-            console.error("Error updating task:", err);
-            alert("Failed to save task status. Reverting UI.");
-            window.location.reload();
         });
     }
 </script>

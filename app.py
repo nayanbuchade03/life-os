@@ -15,19 +15,24 @@ def dashboard():
     today_date = datetime.now().strftime('%Y-%m-%d')
     
     todays_tasks = task_service.get_todays_tasks(today_date)
-    
     total_tasks = len(todays_tasks)
     completed_tasks = sum(1 for t in todays_tasks if t['completion_status'] == 'Completed')
+    
+    todays_revisions = dsa_service.get_todays_revisions(today_date)
     
     stats = {
         'tasks_completed': completed_tasks,
         'total_tasks': total_tasks,
         'current_streak': 0,
-        'dsa_today': 0,
+        'dsa_today': len(todays_revisions),
         'pending_followups': 0
     }
     
-    return render_template('dashboard.html', today_date=today_date, stats=stats, tasks=todays_tasks)
+    return render_template('dashboard.html', 
+                           today_date=today_date, 
+                           stats=stats, 
+                           tasks=todays_tasks,
+                           revisions=todays_revisions)
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
