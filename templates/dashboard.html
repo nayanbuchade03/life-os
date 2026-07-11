@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<header class="page-header">
+    <h1 class="page-title">Dashboard</h1>
+    <p class="page-subtitle">{{ today_date }} • Let's get to work.</p>
+</header>
+
+<div class="dashboard-grid">
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">Daily Progress</span>
+            <i class="ph ph-check-circle" style="color: var(--accent-green); font-size: 1.5rem;"></i>
+        </div>
+        <div class="card-value">{{ stats.tasks_completed }} / {{ stats.total_tasks }}</div>
+        <p class="page-subtitle" style="margin-top: 0.5rem;">Current Streak: {{ stats.current_streak }} days</p>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">DSA Revisions Today</span>
+            <i class="ph ph-code" style="color: var(--accent-blue); font-size: 1.5rem;"></i>
+        </div>
+        <div class="card-value">{{ stats.dsa_today }}</div>
+        <p class="page-subtitle" style="margin-top: 0.5rem;">Problems pending review</p>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">Pending Follow-ups</span>
+            <i class="ph ph-envelope-simple" style="color: var(--accent-yellow); font-size: 1.5rem;"></i>
+        </div>
+        <div class="card-value">{{ stats.pending_followups }}</div>
+        <p class="page-subtitle" style="margin-top: 0.5rem;">Job applications awaiting response</p>
+    </div>
+</div>
+
+<div class="dashboard-grid" style="grid-template-columns: 2fr 1fr;">
+    <div class="card" style="min-height: 300px;">
+        <h3 class="card-title" style="margin-bottom: 1rem;">Today's Priority Tasks</h3>
+        <p class="page-subtitle">No tasks scheduled for today yet.</p>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+        <div class="card" style="min-height: 140px;">
+            <h3 class="card-title">Upcoming Deadlines</h3>
+            <p class="page-subtitle" style="margin-top: 0.5rem;">No immediate deadlines.</p>
+        </div>
+        <div class="card" style="min-height: 140px;">
+            <h3 class="card-title">Weekly Goals Progress</h3>
+            <p class="page-subtitle" style="margin-top: 0.5rem;">Data not available yet.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
