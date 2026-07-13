@@ -5,7 +5,7 @@ from routes.dsa import dsa_bp
 from routes.jobs import jobs_bp
 from routes.follow_ups import follow_ups_bp
 from services import follow_up_service
-from services import task_service
+from services import task_service, dsa_service, job_service
 from routes.analytics import analytics_bp
 from routes.settings import settings_bp
 

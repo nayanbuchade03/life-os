@@ -1,0 +1,45 @@
+# =========================
+# Python & Virtual Env
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.env
+
+# =========================
+# Flask & Application Data
+# =========================
+instance/
+.webassets-cache
+
+# =========================
+# Database & Backups
+# =========================
+# Ignore the actual database files to keep your personal data private, 
+# but allow the database folder itself if you put a .gitkeep in it.
+*.db
+*.sqlite
+*.sqlite3
+/database/*.db
+/database/*.sqlite3
+
+# Ignore the local backups created by the Settings page
+/backups/
+
+# =========================
+# PyInstaller Build Artifacts
+# =========================
+/build/
+/dist/
+*.spec
+*.exe
+
+# =========================
+# IDE & OS Files
+# =========================
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
